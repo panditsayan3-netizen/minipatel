@@ -1,0 +1,8 @@
+{
+  "name": "mini patel",
+  "description": "A comprehensive academic portal featuring student and admin dashboards, coursework and assignment management, grading workflows, attendance tracking, and campus circulars.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
