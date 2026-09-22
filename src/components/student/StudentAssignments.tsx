@@ -103,6 +103,9 @@ export const StudentAssignments: React.FC = () => {
     });
   }, [assignmentItems, activeFilter, selectedCourseId, searchQuery]);
 
+  // Track assignments clicked or submitted to turn the button green immediately
+  const [clickedAssignmentIds, setClickedAssignmentIds] = useState<Set<string>>(new Set());
+
   const handleOpenSubmitModal = (asg: Assignment) => {
     const existingSub = submissions.find(
       (s) => s.assignmentId === asg.id && s.studentId === currentUser.id
@@ -112,6 +115,25 @@ export const StudentAssignments: React.FC = () => {
     setAttachedFileName(existingSub?.attachmentName || '');
     setAttachedFile(null);
     setIntegrityAgreed(false);
+  };
+
+  const handleSubmissionButtonClick = (item: (typeof filteredAssignments)[0]) => {
+    // Immediately mark as clicked so the button turns green
+    setClickedAssignmentIds((prev) => new Set(prev).add(item.id));
+
+    if (item.statusType === 'pending') {
+      submitAssignment(
+        item.id,
+        currentUser.id,
+        'Deliverable submitted successfully via student portal.',
+        item.attachmentName ? `submitted_${item.attachmentName}` : undefined
+      );
+      setSuccessToast(`Deliverable for "${item.title}" submitted successfully!`);
+      setTimeout(() => setSuccessToast(null), 4000);
+    } else {
+      // If already submitted or graded, open the deliverable details modal
+      handleOpenSubmitModal(item);
+    }
   };
 
   const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -145,6 +167,8 @@ export const StudentAssignments: React.FC = () => {
       alert('Please confirm the academic honesty certification before submitting.');
       return;
     }
+
+    setClickedAssignmentIds((prev) => new Set(prev).add(submittingAssignment.id));
 
     submitAssignment(
       submittingAssignment.id,
@@ -400,6 +424,11 @@ export const StudentAssignments: React.FC = () => {
         ) : (
           filteredAssignments.map((item) => {
             const isExpanded = expandedAsgId === item.id;
+            const isSubmittedOrClicked =
+              item.statusType === 'submitted' ||
+              item.statusType === 'graded' ||
+              clickedAssignmentIds.has(item.id);
+
             return (
               <div
                 key={item.id}
@@ -425,7 +454,7 @@ export const StudentAssignments: React.FC = () => {
                       </span>
 
                       {/* Status badge */}
-                      {item.statusType === 'pending' && (
+                      {!isSubmittedOrClicked && item.statusType === 'pending' && (
                         <span
                           className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold ${
                             item.isOverdue
@@ -446,9 +475,9 @@ export const StudentAssignments: React.FC = () => {
                         </span>
                       )}
 
-                      {item.statusType === 'submitted' && (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />
+                      {(isSubmittedOrClicked && item.statusType !== 'graded') && (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 animate-in fade-in">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Submitted</span>
                         </span>
                       )}
@@ -568,24 +597,39 @@ export const StudentAssignments: React.FC = () => {
                       <span>Assigned: {item.assignedDate}</span>
                     </div>
 
-                    <div>
-                      {item.statusType === 'pending' ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isSubmittedOrClicked ? (
+                        <>
+                          <button
+                            id={`btn-submit-${item.id}`}
+                            onClick={() => handleSubmissionButtonClick(item)}
+                            className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold shadow-xs transition-all duration-200 active:scale-95 cursor-pointer"
+                          >
+                            <CheckCircle2 className="w-4 h-4 text-white" />
+                            <span>
+                              {item.statusType === 'graded'
+                                ? 'Graded Deliverable'
+                                : 'Submitted'}
+                            </span>
+                          </button>
+                          <button
+                            id={`btn-edit-submission-${item.id}`}
+                            onClick={() => handleOpenSubmitModal(item)}
+                            className="w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 px-3 py-2 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition-colors cursor-pointer"
+                            title="Upload files, add code repository, or view deliverable details"
+                          >
+                            <FileCode className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Files & Notes</span>
+                          </button>
+                        </>
+                      ) : (
                         <button
                           id={`btn-submit-${item.id}`}
-                          onClick={() => handleOpenSubmitModal(item)}
-                          className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-xs transition-colors"
+                          onClick={() => handleSubmissionButtonClick(item)}
+                          className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold shadow-xs transition-all duration-200 active:scale-95 cursor-pointer"
                         >
                           <Upload className="w-3.5 h-3.5" />
                           <span>Submit Deliverable</span>
-                        </button>
-                      ) : (
-                        <button
-                          id={`btn-resubmit-${item.id}`}
-                          onClick={() => handleOpenSubmitModal(item)}
-                          className="w-full sm:w-auto inline-flex items-center justify-center space-x-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-colors"
-                        >
-                          <FileCode className="w-3.5 h-3.5 text-slate-500" />
-                          <span>{item.statusType === 'graded' ? 'View/Update Deliverable' : 'Update Submission'}</span>
                         </button>
                       )}
                     </div>
@@ -716,7 +760,7 @@ export const StudentAssignments: React.FC = () => {
                     className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
                   />
                   <span className="text-xs text-slate-600 leading-tight">
-                    I confirm that this submission is entirely my own original academic work conforming to the Apex Institute of Technology Honor Code.
+                    I confirm that this submission is entirely my own original academic work conforming to the Mini Patel Institute Honor Code.
                   </span>
                 </label>
               </div>
@@ -726,7 +770,7 @@ export const StudentAssignments: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSubmittingAssignment(null)}
-                  className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -734,13 +778,13 @@ export const StudentAssignments: React.FC = () => {
                   id="btn-confirm-submit-assignment"
                   type="submit"
                   disabled={!integrityAgreed}
-                  className={`inline-flex items-center space-x-2 px-5 py-2 rounded-lg text-xs font-bold text-white shadow-xs transition-all ${
+                  className={`inline-flex items-center space-x-2 px-5 py-2 rounded-lg text-xs font-bold text-white shadow-xs transition-all duration-200 active:scale-95 ${
                     integrityAgreed
-                      ? 'bg-blue-600 hover:bg-blue-700'
+                      ? 'bg-emerald-600 hover:bg-emerald-700 cursor-pointer'
                       : 'bg-slate-300 cursor-not-allowed'
                   }`}
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Submit Deliverable</span>
                 </button>
               </div>

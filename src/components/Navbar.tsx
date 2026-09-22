@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   RefreshCw,
   FileText,
+  User as UserIcon,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -89,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             </div>
             <div>
               <span className="font-bold text-lg tracking-tight text-slate-900 block leading-tight font-['Space_Grotesk']">
-                Apex Institute
+                Mini Patel Institute
               </span>
               <span className="text-xs font-semibold text-blue-600 tracking-wider uppercase">
                 {isStudent ? 'Student Portal' : 'Admin Operations'}
@@ -169,13 +170,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                         }`}
                       >
                         <img
-                          src={u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.name}`}
+                          src={
+                            u.avatar && !u.avatar.includes('1534528741775') && !u.avatar.includes('1573496359142')
+                              ? u.avatar
+                              : (u.name.includes('Sayan')
+                                  ? 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80'
+                                  : (u.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${u.name}`))
+                          }
                           alt={u.name}
                           className="w-7 h-7 rounded-full object-cover border border-slate-200"
                         />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold truncate">{u.name}</p>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-wider">{u.role} {u.rollNo ? `(${u.rollNo})` : ''}</p>
+                          <p className="text-[10px] text-slate-500 truncate">{u.role === 'admin' ? (u.designation || 'Administrator / Faculty') : `Student ${u.rollNo ? `(${u.rollNo})` : ''}`}</p>
                         </div>
                         {u.id === currentUser.id && (
                           <span className="w-2 h-2 rounded-full bg-blue-600"></span>
@@ -183,13 +190,24 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                       </button>
                     ))}
                   </div>
-                  <div className="pt-2 mt-1 border-t border-slate-100 px-3">
+                  <div className="pt-2 mt-1 border-t border-slate-100 px-3 space-y-1">
+                    <button
+                      id="btn-dropdown-edit-profile"
+                      onClick={() => {
+                        handleNavClick('profile');
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full text-left text-xs font-semibold text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50/70 flex items-center space-x-2 py-1.5 px-2 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <UserIcon className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>My Profile & Settings</span>
+                    </button>
                     <button
                       onClick={() => {
                         resetDemoData();
                         setUserDropdownOpen(false);
                       }}
-                      className="w-full text-left text-xs text-slate-500 hover:text-slate-800 flex items-center space-x-2 py-1"
+                      className="w-full text-left text-xs text-slate-500 hover:text-slate-800 flex items-center space-x-2 py-1 px-2 rounded-lg hover:bg-slate-50"
                     >
                       <RefreshCw className="w-3 h-3" />
                       <span>Reset Sample Data</span>
@@ -215,20 +233,46 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             </div>
 
             {/* User Profile avatar & logout */}
-            <div className="flex items-center pl-2 border-l border-slate-200 space-x-2">
-              <img
-                src={currentUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.name}`}
-                alt={currentUser.name}
-                className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200"
-              />
-              <div className="hidden lg:block text-left">
-                <p className="text-xs font-semibold text-slate-800 leading-tight">{currentUser.name}</p>
-                <p className="text-[11px] text-slate-500">{currentUser.rollNo || currentUser.department}</p>
-              </div>
+            <div className="flex items-center pl-2 border-l border-slate-200 space-x-1 sm:space-x-2">
+              <button
+                type="button"
+                id="btn-navbar-profile"
+                onClick={() => handleNavClick('profile')}
+                className={`flex items-center space-x-2 p-1 rounded-xl transition-all text-left cursor-pointer group ${
+                  activeTab === 'profile'
+                    ? 'bg-indigo-50 ring-1 ring-indigo-300'
+                    : 'hover:bg-slate-100'
+                }`}
+                title="View & Edit My Profile"
+              >
+                <div className="relative shrink-0">
+                  <img
+                    src={
+                      currentUser.avatar ||
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`
+                    }
+                    alt={currentUser.name}
+                    className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200 group-hover:ring-indigo-400 transition-all"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`;
+                    }}
+                  />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white" />
+                </div>
+                <div className="hidden lg:block text-left pr-1">
+                  <p className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight truncate max-w-[130px]">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-[11px] text-slate-500 truncate max-w-[130px]">
+                    {currentUser.rollNo || currentUser.designation || currentUser.department}
+                  </p>
+                </div>
+              </button>
+
               <button
                 id="btn-navbar-logout"
                 onClick={logout}
-                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-1"
+                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors ml-1 cursor-pointer"
                 title="Sign out of portal"
               >
                 <LogOut className="w-4 h-4" />
@@ -278,6 +322,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               </button>
             );
           })}
+
+          <button
+            onClick={() => handleNavClick('profile')}
+            className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+              activeTab === 'profile' ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <UserIcon className={`w-4 h-4 ${activeTab === 'profile' ? 'text-indigo-600' : 'text-slate-400'}`} />
+            <span>My Profile & Settings</span>
+          </button>
 
           <div className="pt-3 mt-2 border-t border-slate-100 flex items-center justify-between">
             <span className="text-xs text-slate-500">Logged in as {currentUser.username}</span>

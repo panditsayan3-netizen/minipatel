@@ -6,7 +6,9 @@ export interface User {
   password?: string;
   name: string;
   role: UserRole;
+  designation?: string;
   email: string;
+  altEmail?: string;
   avatar?: string;
   rollNo?: string;
   department?: string;
@@ -14,6 +16,15 @@ export interface User {
   enrolledCourseIds?: string[];
   cgpa?: number;
   phone?: string;
+  assignedCourses?: string[];
+  bio?: string;
+  address?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  officeLocation?: string;
+  officeHours?: string;
+  linkedin?: string;
+  github?: string;
 }
 
 export interface Course {

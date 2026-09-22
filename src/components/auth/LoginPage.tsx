@@ -54,7 +54,7 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
         <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 font-['Space_Grotesk']">
-          Apex Institute of Technology
+          Mini Patel Institute
         </h2>
         <p className="mt-1 text-center text-sm text-slate-500">
           Integrated Student & Academic Administration Portal
@@ -170,20 +170,20 @@ export const LoginPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                id="btn-quick-alex"
-                onClick={() => setDemoCredentials('alex.morgan', 'student123', 'student')}
-                className="text-left p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-xs"
+                id="btn-quick-sayan"
+                onClick={() => setDemoCredentials('sayan.pandit', 'student123', 'student')}
+                className="text-left p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all text-xs cursor-pointer"
               >
-                <span className="font-semibold text-slate-800 block truncate">Alex Morgan (Student)</span>
-                <span className="text-slate-500 block text-[11px]">alex.morgan / student123</span>
+                <span className="font-semibold text-slate-800 block truncate">Mr. Sayan Pandit (Student)</span>
+                <span className="text-slate-500 block text-[11px]">sayan.pandit / student123</span>
               </button>
               <button
                 type="button"
                 id="btn-quick-admin"
                 onClick={() => setDemoCredentials('admin', 'admin123', 'admin')}
-                className="text-left p-2.5 rounded-lg border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-100/60 hover:border-indigo-300 transition-all text-xs"
+                className="text-left p-2.5 rounded-lg border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-100/60 hover:border-indigo-300 transition-all text-xs cursor-pointer"
               >
-                <span className="font-semibold text-indigo-900 block truncate">Dr. Vance (Admin)</span>
+                <span className="font-semibold text-indigo-900 block truncate">Mr. Sayan Pandit (Admin)</span>
                 <span className="text-indigo-600 block text-[11px]">admin / admin123</span>
               </button>
             </div>

@@ -51,6 +51,20 @@ interface CollegeContextType {
   }) => User;
   updateStudent: (id: string, data: Partial<User>) => void;
   deleteStudent: (id: string) => void;
+  addAdminOrFaculty: (data: {
+    name: string;
+    username: string;
+    password?: string;
+    email: string;
+    designation?: string;
+    department?: string;
+    phone?: string;
+    assignedCourses?: string[];
+    avatar?: string;
+  }) => User;
+  updateStaff: (id: string, data: Partial<User>) => void;
+  deleteStaff: (id: string) => void;
+  updateUserProfile: (id: string, data: Partial<User>) => void;
   addCourse: (data: Omit<Course, 'id'>) => Course;
   updateCourse: (id: string, data: Partial<Course>) => void;
   deleteCourse: (id: string) => void;
@@ -84,7 +98,37 @@ const STORAGE_KEYS = {
 export const CollegeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [users, setUsers] = useState<User[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.USERS);
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+    if (!saved) return INITIAL_USERS;
+    try {
+      const parsed: User[] = JSON.parse(saved);
+      const existingIds = new Set(parsed.map((u) => u.id));
+      const missingInitials = INITIAL_USERS.filter((iu) => !existingIds.has(iu.id));
+      const updated = parsed.map((u) => {
+        if (u.id === 'usr-student-1') {
+          return {
+            name: 'Mr. Sayan Pandit',
+            username: 'sayan.pandit',
+            email: 'panditsayan3@gmail.com',
+            avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+            ...u,
+          };
+        }
+        if (u.id === 'usr-admin-1') {
+          return {
+            name: 'Mr. Sayan Pandit',
+            designation: 'Dean of Academic Affairs & Administrator',
+            email: 'panditsayan3@gmail.com',
+            avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+            assignedCourses: ['course-1', 'course-4'],
+            ...u,
+          };
+        }
+        return u;
+      });
+      return [...updated, ...missingInitials];
+    } catch {
+      return INITIAL_USERS;
+    }
   });
 
   const [courses, setCourses] = useState<Course[]>(() => {
@@ -157,7 +201,14 @@ export const CollegeProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const login = (username: string, password: string) => {
     const trimmedUsername = username.trim().toLowerCase();
     const found = users.find(
-      (u) => u.username.toLowerCase() === trimmedUsername && u.password === password
+      (u) =>
+        (u.username.toLowerCase() === trimmedUsername ||
+          u.email.toLowerCase() === trimmedUsername ||
+          (u.id === 'usr-student-1' &&
+            (trimmedUsername === 'sayan.pandit' ||
+              trimmedUsername === 'alex.morgan' ||
+              trimmedUsername === 'sayan'))) &&
+        u.password === password
     );
 
     if (found) {
@@ -221,6 +272,59 @@ export const CollegeProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (currentUserId === id) {
       setCurrentUserId(null);
     }
+  };
+
+  const addAdminOrFaculty = (data: {
+    name: string;
+    username: string;
+    password?: string;
+    email: string;
+    designation?: string;
+    department?: string;
+    phone?: string;
+    assignedCourses?: string[];
+    avatar?: string;
+  }) => {
+    const newStaff: User = {
+      id: `usr-admin-${Date.now()}`,
+      name: data.name,
+      username: data.username.trim().toLowerCase(),
+      password: data.password || 'admin123',
+      role: 'admin',
+      designation: data.designation || 'Faculty Member',
+      email: data.email,
+      department: data.department || 'Computer Science & Engineering',
+      phone: data.phone || '+1 (555) 000-0000',
+      assignedCourses: data.assignedCourses || [],
+      avatar:
+        data.avatar ||
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name)}`,
+    };
+
+    setUsers((prev) => [newStaff, ...prev]);
+    return newStaff;
+  };
+
+  const updateStaff = (id: string, data: Partial<User>) => {
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, ...data } : u)));
+  };
+
+  const deleteStaff = (id: string) => {
+    const admins = users.filter((u) => u.role === 'admin');
+    if (admins.length <= 1) {
+      return;
+    }
+    setUsers((prev) => prev.filter((u) => u.id !== id));
+    if (currentUserId === id) {
+      const remaining = admins.find((u) => u.id !== id);
+      if (remaining) {
+        setCurrentUserId(remaining.id);
+      }
+    }
+  };
+
+  const updateUserProfile = (id: string, data: Partial<User>) => {
+    setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, ...data } : u)));
   };
 
   const addCourse = (data: Omit<Course, 'id'>) => {
@@ -543,6 +647,10 @@ export const CollegeProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addStudent,
         updateStudent,
         deleteStudent,
+        addAdminOrFaculty,
+        updateStaff,
+        deleteStaff,
+        updateUserProfile,
         addCourse,
         updateCourse,
         deleteCourse,

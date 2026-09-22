@@ -17,6 +17,7 @@ import { CourseManagement } from './components/admin/CourseManagement';
 import { AttendanceProvider } from './components/admin/AttendanceProvider';
 import { NotificationManager } from './components/admin/NotificationManager';
 import { AdminAssignments } from './components/admin/AdminAssignments';
+import { UserProfile } from './components/profile/UserProfile';
 
 const AppContent: React.FC = () => {
   const { currentUser } = useCollege();
@@ -34,6 +35,10 @@ const AppContent: React.FC = () => {
   const isStudent = currentUser.role === 'student';
 
   const renderContent = () => {
+    if (activeTab === 'profile') {
+      return <UserProfile onNavigate={setActiveTab} />;
+    }
+
     if (isStudent) {
       switch (activeTab) {
         case 'attendance':
@@ -79,7 +84,7 @@ const AppContent: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <span className="font-bold text-slate-700 font-['Space_Grotesk']">
-              Apex Institute of Technology
+              Mini Patel Institute
             </span>
             <span>&bull;</span>
             <span>Accredited Academic Portal</span>

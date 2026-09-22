@@ -38,6 +38,7 @@ export const AttendanceProvider: React.FC = () => {
 
   const [studentRows, setStudentRows] = useState<StudentAttendanceRow[]>([]);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
   const selectedCourse = courses.find((c) => c.id === selectedCourseId);
   const students = users.filter((u) => u.role === 'student');
@@ -52,10 +53,14 @@ export const AttendanceProvider: React.FC = () => {
     );
 
     // Check if attendance already recorded for this course & date
+    let hasExistingRecord = false;
     const rows: StudentAttendanceRow[] = enrolled.map((st) => {
       const existing = attendance.find(
         (a) => a.studentId === st.id && a.courseId === selectedCourseId && a.date === selectedDate
       );
+      if (existing) {
+        hasExistingRecord = true;
+      }
 
       return {
         studentId: st.id,
@@ -69,22 +74,29 @@ export const AttendanceProvider: React.FC = () => {
 
     setStudentRows(rows);
     setSaveSuccess(false);
+    setIsSaved(hasExistingRecord);
   }, [selectedCourseId, selectedDate, courses, users, attendance]);
 
   const handleStatusChange = (studentId: string, status: AttendanceStatus) => {
     setStudentRows((prev) =>
       prev.map((row) => (row.studentId === studentId ? { ...row, status } : row))
     );
+    setIsSaved(false);
+    setSaveSuccess(false);
   };
 
   const handleRemarksChange = (studentId: string, remarks: string) => {
     setStudentRows((prev) =>
       prev.map((row) => (row.studentId === studentId ? { ...row, remarks } : row))
     );
+    setIsSaved(false);
+    setSaveSuccess(false);
   };
 
   const handleMarkAll = (status: AttendanceStatus) => {
     setStudentRows((prev) => prev.map((row) => ({ ...row, status })));
+    setIsSaved(false);
+    setSaveSuccess(false);
   };
 
   const handleSaveAttendance = () => {
@@ -99,6 +111,7 @@ export const AttendanceProvider: React.FC = () => {
     }));
 
     markAttendance(payload);
+    setIsSaved(true);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 4000);
   };
@@ -226,10 +239,23 @@ export const AttendanceProvider: React.FC = () => {
             type="button"
             onClick={handleSaveAttendance}
             disabled={studentRows.length === 0}
-            className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all disabled:opacity-50"
+            className={`inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all disabled:opacity-50 cursor-pointer ${
+              isSaved || saveSuccess
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white ring-2 ring-emerald-400/40 shadow-emerald-500/20'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+            }`}
           >
-            <Save className="w-3.5 h-3.5" />
-            <span>Save Attendance</span>
+            {isSaved || saveSuccess ? (
+              <>
+                <CheckCheck className="w-3.5 h-3.5" />
+                <span>Attendance Saved</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-3.5 h-3.5" />
+                <span>Save Attendance</span>
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -340,12 +366,26 @@ export const AttendanceProvider: React.FC = () => {
               Changes will immediately update each student&apos;s personal attendance dashboard.
             </span>
             <button
+              id="btn-bottom-save-attendance-records"
               type="button"
               onClick={handleSaveAttendance}
-              className="inline-flex items-center space-x-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all"
+              className={`inline-flex items-center space-x-2 px-5 py-2 rounded-lg text-xs font-bold shadow-sm transition-all cursor-pointer ${
+                isSaved || saveSuccess
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white ring-2 ring-emerald-400/40 shadow-emerald-500/20'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+              }`}
             >
-              <Save className="w-4 h-4" />
-              <span>Submit & Save Attendance</span>
+              {isSaved || saveSuccess ? (
+                <>
+                  <CheckCheck className="w-4 h-4" />
+                  <span>Attendance Saved</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Submit & Save Attendance</span>
+                </>
+              )}
             </button>
           </div>
         )}
