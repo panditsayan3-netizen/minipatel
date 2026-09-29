@@ -15,6 +15,10 @@ import {
   FileText,
   Upload,
   User as UserIcon,
+  Video,
+  Image as ImageIcon,
+  Play,
+  Maximize2,
 } from 'lucide-react';
 
 interface StudentDashboardProps {
@@ -31,6 +35,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onNavigate }
     submissions,
     getStudentAssignmentSummary,
     submitAssignment,
+    lectures,
   } = useCollege();
 
   if (!currentUser) return null;
@@ -389,6 +394,87 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onNavigate }
                   </div>
                 ))
               )}
+            </div>
+          </div>
+
+          {/* Recent Class Lectures & Whiteboard Captures */}
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+              <div className="flex items-center space-x-2">
+                <Video className="w-5 h-5 text-indigo-600" />
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 font-['Space_Grotesk']">
+                    Class Lectures & Whiteboards
+                  </h2>
+                  <p className="text-xs text-slate-500">
+                    Latest recorded lectures and whiteboard snapshots from your professors
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => onNavigate('lectures')}
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 cursor-pointer"
+              >
+                <span>View All Media</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {lectures.slice(0, 4).map((lec) => {
+                const course = courses.find((c) => c.id === lec.courseId);
+                const isVideo = lec.mediaType === 'video';
+                return (
+                  <div
+                    key={lec.id}
+                    onClick={() => onNavigate('lectures')}
+                    className="group p-3 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-slate-50 hover:border-indigo-200 transition-all cursor-pointer flex flex-col justify-between"
+                  >
+                    <div className="flex items-start space-x-3 mb-2">
+                      <div className="relative w-16 h-12 rounded-lg overflow-hidden bg-slate-900 shrink-0">
+                        <img
+                          src={lec.thumbnailUrl || lec.mediaUrl}
+                          alt={lec.title}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                          {isVideo ? (
+                            <Play className="w-4 h-4 text-white fill-current" />
+                          ) : (
+                            <Maximize2 className="w-3.5 h-3.5 text-white" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-1.5 mb-1">
+                          <span className="text-[10px] font-mono font-bold bg-white border border-slate-200 text-indigo-700 px-1.5 py-0.2 rounded">
+                            {course?.code}
+                          </span>
+                          <span
+                            className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded ${
+                              isVideo
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-emerald-100 text-emerald-800'
+                            }`}
+                          >
+                            {isVideo ? 'Video' : 'Whiteboard'}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                          {lec.title}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1.5 border-t border-slate-100">
+                      <span>{lec.date}</span>
+                      <span className="font-medium text-slate-600 truncate max-w-[120px]">
+                        {course?.instructor || lec.uploaderName}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

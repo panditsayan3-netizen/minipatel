@@ -21,6 +21,7 @@ import {
   Plus,
   ShieldPlus,
   User as UserIcon,
+  Video,
 } from 'lucide-react';
 import { FacultyManagementSection } from './FacultyManagementSection';
 import { AddAdminFacultyModal } from './AddAdminFacultyModal';
@@ -30,7 +31,7 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const { users, courses, attendance, notifications, assignments, submissions, currentUser } = useCollege();
+  const { users, courses, attendance, notifications, assignments, submissions, currentUser, lectures } = useCollege();
   const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
 
   const students = users.filter((u) => u.role === 'student');
@@ -258,6 +259,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
             <ArrowRight className="w-3 h-3" />
           </div>
         </div>
+
+        {/* Class Lectures & Whiteboards Stat Card */}
+        <div
+          id="admin-stat-lectures"
+          onClick={() => onNavigate('lectures')}
+          className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs hover:border-indigo-300 hover:shadow-sm transition-all cursor-pointer group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Lectures & Media</span>
+            <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+              <Video className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-slate-900 font-['Space_Grotesk']">
+              {lectures.length}
+            </span>
+            <span className="text-xs text-indigo-600 font-semibold">
+              {lectures.filter((l) => l.mediaType === 'video').length} Videos &bull; {lectures.filter((l) => l.mediaType === 'photo').length} Photos
+            </span>
+          </div>
+          <div className="mt-2 text-xs text-indigo-600 font-medium group-hover:underline flex items-center gap-1">
+            <span>Manage class recordings & notes</span>
+            <ArrowRight className="w-3 h-3" />
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions Bar */}
@@ -265,7 +292,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
           Administrative Operations Hub
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
           <button
             id="btn-hub-add-faculty"
             onClick={() => setIsAddStaffModalOpen(true)}
@@ -289,25 +316,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
             <span>Create Course</span>
           </button>
           <button
+            onClick={() => onNavigate('lectures')}
+            className="flex items-center space-x-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/70 hover:border-indigo-300 hover:text-indigo-900 transition-all text-xs font-semibold text-indigo-800 text-left cursor-pointer"
+          >
+            <Video className="w-4 h-4 text-indigo-600 shrink-0" />
+            <span>Upload Lectures</span>
+          </button>
+          <button
             onClick={() => onNavigate('assignments')}
             className="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-purple-50/70 hover:border-purple-200 hover:text-purple-800 transition-all text-xs font-semibold text-slate-700 text-left"
           >
             <FileText className="w-4 h-4 text-purple-600 shrink-0" />
-            <span>Manage Assignments</span>
+            <span>Assignments</span>
           </button>
           <button
             onClick={() => onNavigate('attendance_provider')}
             className="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-emerald-50/70 hover:border-emerald-200 hover:text-emerald-800 transition-all text-xs font-semibold text-slate-700 text-left"
           >
             <ClipboardList className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Take Attendance</span>
+            <span>Attendance</span>
           </button>
           <button
             onClick={() => onNavigate('notifications')}
             className="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-amber-50/70 hover:border-amber-200 hover:text-amber-800 transition-all text-xs font-semibold text-slate-700 text-left"
           >
             <Megaphone className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>Broadcast Notice</span>
+            <span>Broadcast</span>
           </button>
         </div>
       </div>

@@ -24,6 +24,7 @@ export const StudentManagement: React.FC = () => {
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<User | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<User | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -163,11 +164,15 @@ export const StudentManagement: React.FC = () => {
   };
 
   const handleDelete = (student: User) => {
-    if (window.confirm(`Are you sure you want to delete student "${student.name}" (${student.rollNo})?`)) {
-      deleteStudent(student.id);
-      setSuccessToast(`Student ${student.name} removed.`);
-      setTimeout(() => setSuccessToast(null), 3000);
-    }
+    setStudentToDelete(student);
+  };
+
+  const confirmDeleteAction = () => {
+    if (!studentToDelete) return;
+    deleteStudent(studentToDelete.id);
+    setSuccessToast(`Student "${studentToDelete.name}" (${studentToDelete.rollNo || studentToDelete.username}) has been permanently removed.`);
+    setStudentToDelete(null);
+    setTimeout(() => setSuccessToast(null), 4000);
   };
 
   const uniqueDepartments = Array.from(new Set(students.map((s) => s.department || 'General')));
@@ -541,6 +546,46 @@ export const StudentManagement: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* In-App Delete Confirmation Modal */}
+      {studentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden p-6 space-y-4">
+            <div className="flex items-center space-x-3 text-rose-600">
+              <div className="p-3 bg-rose-100 rounded-full">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 font-['Space_Grotesk']">
+                  Delete Student Account
+                </h3>
+                <p className="text-xs text-slate-500">Permanent action</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Are you sure you want to delete student <span className="font-bold text-slate-900">&quot;{studentToDelete.name}&quot;</span> (Roll No: <span className="font-mono font-semibold">{studentToDelete.rollNo || 'N/A'}</span>)? All associated attendance records and submissions will also be cleaned up.
+            </p>
+
+            <div className="flex items-center justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStudentToDelete(null)}
+                className="px-4 py-2 border border-slate-300 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                id="btn-confirm-delete-student"
+                type="button"
+                onClick={confirmDeleteAction}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-sm"
+              >
+                Yes, Delete Student
+              </button>
+            </div>
           </div>
         </div>
       )}

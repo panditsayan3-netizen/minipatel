@@ -18,6 +18,7 @@ import { AttendanceProvider } from './components/admin/AttendanceProvider';
 import { NotificationManager } from './components/admin/NotificationManager';
 import { AdminAssignments } from './components/admin/AdminAssignments';
 import { UserProfile } from './components/profile/UserProfile';
+import { ClassLecturesHub } from './components/lectures/ClassLecturesHub';
 
 const AppContent: React.FC = () => {
   const { currentUser } = useCollege();
@@ -37,6 +38,10 @@ const AppContent: React.FC = () => {
   const renderContent = () => {
     if (activeTab === 'profile') {
       return <UserProfile onNavigate={setActiveTab} />;
+    }
+
+    if (activeTab === 'lectures') {
+      return <ClassLecturesHub />;
     }
 
     if (isStudent) {

@@ -25,6 +25,7 @@ export const CourseManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [viewingRosterCourse, setViewingRosterCourse] = useState<Course | null>(null);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -128,11 +129,15 @@ export const CourseManagement: React.FC = () => {
   };
 
   const handleDelete = (course: Course) => {
-    if (window.confirm(`Delete course ${course.code}: ${course.title}? This will unenroll all students.`)) {
-      deleteCourse(course.id);
-      setToast(`Course ${course.code} removed.`);
-      setTimeout(() => setToast(null), 3000);
-    }
+    setCourseToDelete(course);
+  };
+
+  const confirmDeleteCourse = () => {
+    if (!courseToDelete) return;
+    deleteCourse(courseToDelete.id);
+    setToast(`Course ${courseToDelete.code} removed.`);
+    setCourseToDelete(null);
+    setTimeout(() => setToast(null), 3000);
   };
 
   const departments = Array.from(new Set(courses.map((c) => c.department)));
@@ -557,6 +562,46 @@ export const CourseManagement: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* In-App Course Delete Confirmation Modal */}
+      {courseToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden p-6 space-y-4">
+            <div className="flex items-center space-x-3 text-rose-600">
+              <div className="p-3 bg-rose-100 rounded-full">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 font-['Space_Grotesk']">
+                  Delete Course
+                </h3>
+                <p className="text-xs text-slate-500">Permanent action</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Are you sure you want to delete <span className="font-bold text-slate-900">&quot;{courseToDelete.code}: {courseToDelete.title}&quot;</span>? This will unenroll all students and remove associated coursework and attendance records.
+            </p>
+
+            <div className="flex items-center justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setCourseToDelete(null)}
+                className="px-4 py-2 border border-slate-300 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                id="btn-confirm-delete-course"
+                type="button"
+                onClick={confirmDeleteCourse}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-sm"
+              >
+                Yes, Delete Course
+              </button>
+            </div>
           </div>
         </div>
       )}

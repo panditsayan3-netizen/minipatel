@@ -97,3 +97,25 @@ export interface AssignmentSubmission {
   gradedAt?: string;
   gradedBy?: string;
 }
+
+export type LectureMediaType = 'video' | 'photo';
+
+export interface LectureMedia {
+  id: string;
+  courseId: string;
+  title: string;
+  description?: string;
+  mediaType: LectureMediaType;
+  mediaUrl: string; // Base64 data URL or external video/image URL
+  thumbnailUrl?: string;
+  uploadedBy: string; // User ID or username
+  uploaderName?: string;
+  date: string; // YYYY-MM-DD (lecture session date)
+  createdAt: string; // ISO date string
+  duration?: string; // e.g. "45 min" for videos
+  fileSize?: string; // e.g. "24.5 MB"
+  tags?: string[];
+  unitOrTopic?: string;
+  whiteboardNotes?: boolean;
+}
+

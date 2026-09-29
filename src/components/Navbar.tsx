@@ -18,6 +18,8 @@ import {
   RefreshCw,
   FileText,
   User as UserIcon,
+  Video,
+  Database,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,7 +28,17 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
-  const { currentUser, logout, switchUser, users, notifications, assignments, submissions, resetDemoData } = useCollege();
+  const {
+    currentUser,
+    logout,
+    switchUser,
+    users,
+    notifications,
+    assignments,
+    submissions,
+    resetDemoData,
+    fetchApiData,
+  } = useCollege();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
@@ -52,6 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'attendance', label: 'My Attendance', icon: CalendarCheck },
     { id: 'courses', label: 'My Courses', icon: BookOpen },
+    { id: 'lectures', label: 'Class Lectures', icon: Video },
     { id: 'assignments', label: 'Assignments', icon: FileText, badge: studentPendingCount },
     { id: 'notifications', label: 'Announcements', icon: Bell },
   ];
@@ -60,6 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
     { id: 'students', label: 'Students Directory', icon: Users },
     { id: 'courses', label: 'Courses Management', icon: FolderPlus },
+    { id: 'lectures', label: 'Class Lectures', icon: Video },
     { id: 'assignments', label: 'Assignments Hub', icon: FileText, badge: adminPendingGradingCount },
     { id: 'attendance_provider', label: 'Attendance Provider', icon: ClipboardList },
     { id: 'notifications', label: 'Broadcast Notices', icon: Bell },
@@ -191,6 +205,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                     ))}
                   </div>
                   <div className="pt-2 mt-1 border-t border-slate-100 px-3 space-y-1">
+                    <button
+                      id="btn-dropdown-api-fetch"
+                      onClick={() => {
+                        fetchApiData();
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full text-left text-xs text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50/70 flex items-center space-x-2 py-1.5 px-2 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <Database className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Fetch Latest API Data</span>
+                    </button>
                     <button
                       id="btn-dropdown-edit-profile"
                       onClick={() => {

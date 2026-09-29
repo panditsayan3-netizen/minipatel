@@ -1,4 +1,4 @@
-import { Course, Notification, User, AttendanceRecord, Assignment, AssignmentSubmission } from './types';
+import { Course, Notification, User, AttendanceRecord, Assignment, AssignmentSubmission, LectureMedia } from './types';
 
 export const INITIAL_USERS: User[] = [
   {
@@ -419,3 +419,75 @@ export const INITIAL_SUBMISSIONS: AssignmentSubmission[] = [
     status: 'submitted'
   }
 ];
+
+export const INITIAL_LECTURES: LectureMedia[] = [
+  {
+    id: 'lec-3',
+    courseId: 'course-2',
+    title: 'Lecture 09: Transaction Isolation Levels, ACID & Strict 2PL Protocol',
+    description: 'Lecture video discussing dirty reads, non-repeatable reads, phantom anomalies, and how two-phase locking guarantees conflict serializability in high-throughput engines.',
+    mediaType: 'video',
+    mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    uploadedBy: 'usr-faculty-1',
+    uploaderName: 'Prof. Rajesh Verma',
+    date: '2026-09-16',
+    createdAt: '2026-09-16T14:15:00Z',
+    duration: '46 min',
+    fileSize: '162 MB',
+    tags: ['ACID', 'Transactions', 'Locks', 'Concurrency Control'],
+    unitOrTopic: 'Unit 3: Transaction Processing'
+  },
+  {
+    id: 'lec-4',
+    courseId: 'course-2',
+    title: 'Whiteboard Diagram: Relational Normalization 1NF to BCNF Proof Map',
+    description: 'Whiteboard diagram showing functional dependency closures, candidate key deductions, and lossless-join BCNF decomposition step-by-step table split.',
+    mediaType: 'photo',
+    mediaUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=1200&auto=format&fit=crop&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&auto=format&fit=crop&q=80',
+    uploadedBy: 'usr-faculty-1',
+    uploaderName: 'Prof. Rajesh Verma',
+    date: '2026-09-15',
+    createdAt: '2026-09-15T15:20:00Z',
+    fileSize: '3.6 MB',
+    tags: ['Whiteboard Notes', 'BCNF', 'Normalization', 'Schema Design'],
+    unitOrTopic: 'Unit 2: Relational Schema Design',
+    whiteboardNotes: true
+  },
+  {
+    id: 'lec-5',
+    courseId: 'course-3',
+    title: 'Lab Demo: Multi-Container Setup with Docker Compose, Redis & Nginx',
+    description: 'Hands-on lab screencast walking through container networks, automated environment variables injection, persistent volumes, and health check inspection.',
+    mediaType: 'video',
+    mediaUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=80',
+    uploadedBy: 'usr-admin-1',
+    uploaderName: 'Mr. Sayan Pandit',
+    date: '2026-09-14',
+    createdAt: '2026-09-14T09:00:00Z',
+    duration: '38 min',
+    fileSize: '135 MB',
+    tags: ['Docker', 'Containers', 'DevOps', 'Microservices', 'Lab Demo'],
+    unitOrTopic: 'Unit 4: Cloud Infrastructure'
+  },
+  {
+    id: 'lec-6',
+    courseId: 'course-3',
+    title: 'Whiteboard Notes: Distributed Cache Topology & Invalidation Strategies',
+    description: 'Whiteboard photo summarizing Cache-Aside, Write-Through, and Write-Behind trade-offs, with cache stampede mitigation using distributed mutexes.',
+    mediaType: 'photo',
+    mediaUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&auto=format&fit=crop&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=80',
+    uploadedBy: 'usr-admin-1',
+    uploaderName: 'Mr. Sayan Pandit',
+    date: '2026-09-12',
+    createdAt: '2026-09-12T16:00:00Z',
+    fileSize: '5.2 MB',
+    tags: ['Whiteboard Notes', 'System Design', 'Caching', 'Architecture'],
+    unitOrTopic: 'Unit 3: Scalability & Performance',
+    whiteboardNotes: true
+  }
+];
+

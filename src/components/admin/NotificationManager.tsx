@@ -21,6 +21,7 @@ export const NotificationManager: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [notifToDelete, setNotifToDelete] = useState<Notification | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -61,11 +62,15 @@ export const NotificationManager: React.FC = () => {
   };
 
   const handleDelete = (notif: Notification) => {
-    if (window.confirm(`Delete circular "${notif.title}"?`)) {
-      deleteNotification(notif.id);
-      setToast('Notice removed.');
-      setTimeout(() => setToast(null), 3000);
-    }
+    setNotifToDelete(notif);
+  };
+
+  const confirmDeleteNotif = () => {
+    if (!notifToDelete) return;
+    deleteNotification(notifToDelete.id);
+    setToast('Notice removed.');
+    setNotifToDelete(null);
+    setTimeout(() => setToast(null), 3000);
   };
 
   const getCategoryBadge = (cat: NotificationCategory) => {
